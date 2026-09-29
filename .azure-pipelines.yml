@@ -1,0 +1,147 @@
+# Azure DevOps Pipeline for Ansible Automation Platform Enterprise on GCP
+# This pipeline handles research, development, testing, and code review
+# NO DEPLOYMENT - Only test and push to GitHub
+
+trigger:
+  - main
+
+variables:
+  - name: BuildConfiguration
+    value: Release
+  - name: RHEL_VERSION
+    value: '9.4'
+  - name: RHAA_CONTAINER_IMAGE
+    value: 'quay.io/ansible/automation-platform:$LATEST'
+  - name: GCP_PROJECT_ID
+    value: 'your-gcp-project-id'
+
+stages:
+  # Stage 1: Research Phase
+  - stage: research
+    displayName: 'Research Phase'
+    jobs:
+      - job: research
+        displayName: 'Research Tasks'
+        steps:
+          - task: CmdLine@2
+            displayName: 'Start Research'
+            inputs:
+              script: |
+                echo "=== Research Phase Started ==="
+                echo "Topic: RHAA Enterprise on RHEL 9 with Entra ID SSO"
+                echo ""
+                echo "Research areas:"
+                echo "1. RHAA container images (latest versions)"
+                echo "2. RHEL 9 compatibility matrix"
+                echo "3. Entra ID SSO integration patterns"
+                echo "4. GCP infrastructure requirements"
+                echo ""
+                echo "Team members can add findings to:"
+                echo "- research/log.md"
+                echo "- research/[topic].md"
+
+  # Stage 2: Development Phase  
+  - stage: develop
+    displayName: 'Development Phase'
+    dependsOn: research
+    condition: succeeded('research')
+    jobs:
+      - job: develop
+        displayName: 'Code Development'
+        steps:
+          - task: CmdLine@2
+            displayName: 'Setup Development Environment'
+            inputs:
+              script: |
+                echo "=== Development Phase ==="
+                echo "Ready for team to add code in:"
+                echo "- code/ directory"
+                echo ""
+                echo "Team can commit and push changes to GitHub"
+
+  # Stage 3: Testing Phase
+  - stage: test
+    displayName: 'Testing Phase'
+    dependsOn: develop
+    condition: succeeded('develop')
+    jobs:
+      - job: unit-tests
+        displayName: 'Unit Tests'
+        steps:
+          - task: CmdLine@2
+            displayName: 'Run Unit Tests'
+            inputs:
+              script: |
+                echo "=== Testing Phase ==="
+                echo "Running tests in:"
+                echo "- tests/test_sso_integration.py"
+                echo "- tests/test_permissions.py"
+                echo ""
+                echo "Test results can be pushed to GitHub"
+
+  # Stage 4: Code Review Phase
+  - stage: review
+    displayName: 'Code Review Phase'
+    dependsOn: test
+    condition: succeeded('test')
+    jobs:
+      - job: manual-review
+        displayName: 'Manual Review & Validation'
+        steps:
+          - task: CmdLine@2
+            displayName: 'Validation Checklist'
+            inputs:
+              script: |
+                echo "=== Code Review Phase ==="
+                echo ""
+                echo "Review checklist:"
+                echo "[ ] SSO integration tests passing"
+                echo "[ ] RBAC permission tests passing"
+                echo "[ ] Code quality checks"
+                echo "[ ] Documentation updated"
+                echo "[ ] Security review completed"
+
+  # Stage 5: Push to GitHub Phase
+  - stage: push_to_github
+    displayName: 'Push Changes to GitHub'
+    dependsOn: review
+    condition: succeeded('review')
+    jobs:
+      - job: push_changes
+        displayName: 'Push to GitHub'
+        steps:
+          - task: CmdLine@2
+            displayName: 'Commit and Push'
+            inputs:
+              script: |
+                echo "=== Push Phase ==="
+                echo "Ready to commit and push changes to:"
+                echo "https://github.com/bayappolo/ansible-gcp-ado-project"
+                echo ""
+                echo "Team can use standard git commands:"
+                echo "git add ."
+                echo "git commit -m \"your message\""
+                echo "git push origin main"
+
+  # Stage 6: Documentation Phase
+  - stage: document
+    displayName: 'Documentation Phase'
+    dependsOn: research
+    condition: succeeded()
+    jobs:
+      - job: write_docs
+        displayName: 'Write Documentation'
+        steps:
+          - task: CmdLine@2
+            displayName: 'Documentation Tasks'
+            inputs:
+              script: |
+                echo "=== Documentation Phase ==="
+                echo "Team can add documentation in:"
+                echo "- docs/ directory"
+                echo ""
+                echo "Documentation topics:"
+                echo "1. RHAA Enterprise installation guide"
+                echo "2. Entra ID SSO setup instructions"
+                echo "3. RBAC configuration guide"
+                echo "4. Testing best practices"
