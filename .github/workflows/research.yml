@@ -1,0 +1,20 @@
+name: Research Phase
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Research topic'
+        required: true
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Research task
+        run: |
+          echo "Researching: ${{ github.event.inputs.topic }}"
+          # Team member research tasks here
