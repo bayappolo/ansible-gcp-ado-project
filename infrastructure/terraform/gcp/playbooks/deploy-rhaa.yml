@@ -1,0 +1,60 @@
+---
+# Ansible Playbook: Deploy RHAA Enterprise on GCP
+# This playbook deploys Red Hat Ansible Automation Platform Enterprise Edition
+# using containerized solution with UBI images
+
+- name: Deploy RHAA Enterprise Container Stack
+  hosts: localhost
+  become: false
+  
+  vars:
+    rhaa_image: "quay.io/ansible/automation-platform:$LATEST"
+    namespace: "rhaa-enterprise"
+    project_id: "{{ lookup('env', 'GCP_PROJECT_ID') }}"
+    
+  tasks:
+    - name: Pull RHA Enterprise container image
+      community.docker.docker_pull_image:
+        name: "{{ rhaa_image }}"
+        source: registry
+        state: present
+      
+    - name: Create RHAA deployment directory
+      file:
+        path: "/opt/rhaa-enterprise"
+        state: directory
+        mode: '0755'
+      
+    - name: Deploy RHAA Enterprise manifest
+      copy:
+        dest: "/opt/rhaa-enterprise/deploy-manifest.yml"
+        content: |
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: rhaa-enterprise
+            namespace: {{ namespace }}
+          spec:
+            replicas: 3
+            selector:
+              matchLabels:
+                app: rhaa-enterprise
+            template:
+              metadata:
+                labels:
+                  app: rhaa-enterprise
+              spec:
+                containers:
+                  - name: rhaa-container
+                    image: "{{ rha_image }}"
+                    ports:
+                      - containerPort: 8080
+                    env:
+                      - name: DATABASE_URL
+                        valueFrom:
+                          secretKeyRef:
+                            name: rhaa-db-secret
+                            key: url
+                      - name: SSO_ENABLED
+                        value: "true"
+        mode: '0644'
